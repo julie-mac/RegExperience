@@ -11,7 +11,7 @@ While it may look like gibberish to some folks, each component has a different f
 We will be going through each component of the following regular expression: `/^#?([a-f0-9]{6}|[a-f0-9]{3})$/`
 This is the regex used to match hex values, or hex color codes used in HTML and CSS.
 Hex codes are 3-byte, 3 or 6-digit codes that render as a colour. When you define a hex code by only 3 digits, it is automatically rendered as a 6-digit code with each character repeated once. For example, hex codes `#a54` and `#aa5544` are equivalent and will be rendered the same.
-Each pair of digits is used to define the intensity of red, green and blue within a colour, respectively. Each byte value ranges from 00 to FF, from lowest to highest intensity. For example, hex code `#ffffff` is the highest intensity of all three colours, which shows up as white on your screen. Hex code `#000000` is the lowest intensity, so it shows up as black. 
+Each pair of digits is used to define the intensity of red, green and blue within a colour, respectively. Each byte value ranges from 00 to FF, from lowest to highest intensity. For example, hex code `#ffffff` is the highest intensity of all three colours, which shows up as white on your screen. Hex code `#000000` is the lowest intensity for each colour, so it shows up as black. 
 
 ## Table of Contents
 
@@ -22,10 +22,7 @@ Each pair of digits is used to define the intensity of red, green and blue withi
 - [Flags](#flags)
 - [Grouping and Capturing](#grouping-and-capturing)
 - [Bracket Expressions](#bracket-expressions)
-- [Greedy and Lazy Match](#greedy-and-lazy-match)
 - [Boundaries](#boundaries)
-- [Back-references](#back-references)
-- [Look-ahead and Look-behind](#look-ahead-and-look-behind)
 
 ## Regex Components
 
@@ -71,7 +68,7 @@ A string like `giraffe2000` would not return a match either, as the last charact
 
 ### Quantifiers
 
-Quantifiers are generally "greedy", meaning they allow for more matches.
+Quantifiers are used to define the amount of times a pattern can match.
 
 #### The `?` Quantifier
 
@@ -79,7 +76,7 @@ The `?`following the `#` in the expression is an optional quantifier, rendering 
 
 Code snippet: `^#?`
 
-Whether the first character in a string is a hashtag of not, it could potentially be a match, given it satisfies other criteria in the expression. This is considered a greedy quantifier as it allows the optional item to be included, if possible.
+Whether the first character in a string is a hashtag of not, it could potentially be a match, given it satisfies other criteria in the expression.
 
 ##### Examples of The `?` Quantifier
 
@@ -101,7 +98,9 @@ In the first case, to the left of the `|` symbol, this quantifier is allowing a 
 
 In the second instance, to the right of the `|` symbol, these curly brackets are requiring a fixed amount of 3 characters within those alpabetical and numerical ranges mentioned above.
 
-In this particular expression, the use of `|` is as an OR Operator, which means we need 6 OR 3 characters in a given string in order to return a match, not any number in between.
+In this particular expression, the use of `|` is as an OR Operator, which we'll talk about in the next section, which means we need 6 OR 3 characters in a given string in order to return a match, not any number in between.
+
+If there are no curly brackets to quantify the amount of times a character can repeat itself, a regex would return a match from a string of any length, given it matches up with other criteria that may be present.
 
 ##### Examples of the Curly Brackets Quantifier `{}`
 
@@ -109,7 +108,7 @@ If you apply `/{ 3-10 }/` to a string like `Dog`, it will return a match as it s
 If you apply the same expression to a string like `Superfluous`, it will not return a match as the length exceeds the given range in the expression.
 
 If you apply `/{ 5, }/` to a string like `Dog`, it will not return a match, as it does not meet the minimum length of 5 characters.
-If you apply that expression to `Superfluous`, however, it will return a match because it is longer than the minimum length and there is no maximum stated in the expression.
+If you apply that expression to `Superfluous`, however, it will return a match because it is satisfies the minimum length and there is no maximum stated in the expression.
 
 ### OR Operator 
 
@@ -145,39 +144,51 @@ In our case, the characters allowed in the hex code are lowercase letters rangin
 
 #### More Examples of Character Classes
 
-You can set a range of different letters and numbers, but there are also shorter forms that can be used to represent entire sets of characters from the same class.
-
-For example, the expression `/[:alnum:]/` includes all letters from A to Z, case insensitively, as well as all digits from 0 `0` to `9`. A longer equivalent would be `/[ a-z A-Z 0-9 /`.
-If we apply that expression to a string like `AbC123`, it will return as a match. However, if we apply that same expression to something like  `AbC_123`, it will not return as a match, as the `alnum` character class does not include any symbols.
-
-If we apply an expression like `/[asdfghjkl]/` to a string such as `poppy`, it will not return a match, since none of the letters in the given character class are present in the string. This expression would be looking for at least one of those lettesr to be present in the string, and since there is no quantifier next to it, the length of the string is not fixed to any number of characters, nor does it exclude other letters, numbers or special characters.
-A string like ``
+If we apply an expression like `/[asdfghjkl]/` to a string such as `poppy`, it will not return a match, since none of the letters in the given character class are present in the string. 
+This expression would be looking for at least one of those letters to be present in the string, and since there is no quantifier next to it, the length of the string is not fixed to any number of characters, nor does it exclude other letters, numbers or special characters.
+A string like `abc!123` would return a match, as it contains at least one of the characters within the brackets of the expression.
+If we add a quantifier and different anchors and turn it into `/^[asdfghjkl]{3}$/`, then `abc!123` would not return a match, as the expression will only accept a 3-character-long string, for example `fad`, starting and ending with characters from the given set.
 
 ### Grouping and Capturing
 
+Grouping is used in regular expressions by enclosing subpatterns in parentheses `()` in order to narrow the scope of matches, and are used with quantifers on their exterior.
+Capturing is essentially referring to what's insides those parentheses, the characters denoted in the bracket expressions []. 
+
+Code snippet: `^#?([a-f0-9]{6}|[a-f0-9]{3})$`
+
+The hex value regex, we have what's called a capturing group. The parentheses are enclosing a specific set of characters that are allowed to be in the string. The `^` and `$` anchors are specifiying their position in the entire string, whereas the `{6}`and `{3}` quantifiers are saying how many instances those characters need to repeat themselves. We have an OR operator in the middle as well, saying that the characters in the bracket expressions can repeat themselves 3 OR 6 times, with an optional hashtag allowed at the beginning of a string.
+
 ### Bracket Expressions
 
-Bracket expressions are what contains a range of characters allowed as criteria in a regex.
+Bracket expressions represent a single instance of a character included in a given character class.
 
-Code snippet: `[a-f0-9]`
+Code snippet: `[a-f0-9]{3}`
 
-Like we mentioned before, the hex code regex allowed lower case letters from `a` to `f` and numbers from `1` to `9`.
+Like we mentioned before, the hex code regex allowed lower case letters from `a` to `f` and numbers from `1` to `9`. That little code snippet represents a single instance of a character, and quantifiers like `{3}` decide how many times it will need to repeat itself.
 
 #### Another Example of Bracket Expressions `[]`
 
-Bracket expressions are known as a positive character group, as they want to include as many. For example, an expression like `/[]/`
-
-### Greedy and Lazy Match
+Bracket expressions are known as a positive character group, as they want to include as many options as possible. For example, an expression like `/[abc]/` would need only one instance of one of those letters to qualify as a match. The presence of other characters does not matter, nor does the length of the string, since it has no quantifiers or anchors.
+A string such as `fax` would match, as it contains the letter `a`. On the other hand, a string such as `superfluous` would not return a match, as it does not contain any of the letters `a`, `b` or `c`.
 
 ### Boundaries
 
+Boundaries are used in regular expressions to assert the position of certain characters. 
+
+Code snippets: `/^` and `$/`
+
+The `^` anchor directly after the first slash `/` asserts that a certain character must be present at the beginning of the string to be considered a match. In our case, it can be either an optional hashtag or a hexadecimal digit.
+
+The `$` anchor just before the closing slash `/` asserts that a certain character must be present at the end of the string in order to be a match. In the case of the hex value regex, we would need a hexidecimal digit.
+
+#### Another Example of Boundaries
+
+Let's say we have a regex such as `/\bhow\b/`. This expression uses `\b`, which is a word boundary assertion, at the beginning and end of the expression. It's looking to match the word `how` in its entirety, on its own as a separate word.
+When applied to a string like `Hello, how are you?`, the expression would match up with the word `how` within that string, but a string like `Howdy, how are you?` would not return a match on the first `How`, as it is part of the larger word `Howdy`. It would only match up with the second instance of `how` as it is its own word.
+
 ## Author
 
-A short section about the author with a link to the author's GitHub profile (replace with your information and a link to your profile)
+I'm Julie, currently a student at the University of Toronto doing a bootcamp on full-stack web development. I hope to transition into a related career path when finished. It's been a great journey so far! You can check out my GitHub profile by clicking [here](https://github.com/julie-mac).
 
-https://www.cs.wcupa.edu/rkline/index/regular-expressions.html
-https://htmlcolorcodes.com/
-https://www.regular-expressions.info
-https://www.gnu.org/software/grep/manual/html_node/Character-Classes-and-Bracket-Expressions.html
 
 
