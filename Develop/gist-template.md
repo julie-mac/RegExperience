@@ -133,7 +133,7 @@ Either of the following four strings will return a match:
 - `I walked to work, but I wish I had taken the bus.`
 - `I walked to work, but I wish I had taken the train.`
 
-However, a string like `I drove to work, but I wish I had taken the bus.` would not return a match, as `drove` is neither one of the options presented in the expression. 
+However, a string like `I drove to work, but I wish I had taken the car.` would not return a match, as `car` is neither one of the options presented in the expression. 
 
 ### Character Classes
 
@@ -143,17 +143,15 @@ Code snippet: `[a-f0-9]`
 
 In our case, the characters allowed in the hex code are lowercase letters ranging from `a`to `f` and digits from `0` to `9`. This is the hexadecimal number system, composed of 16 characters.
 
-#### Another Example of Character Classes
+#### More Examples of Character Classes
 
 You can set a range of different letters and numbers, but there are also shorter forms that can be used to represent entire sets of characters from the same class.
 
 For example, the expression `/[:alnum:]/` includes all letters from A to Z, case insensitively, as well as all digits from 0 `0` to `9`. A longer equivalent would be `/[ a-z A-Z 0-9 /`.
 If we apply that expression to a string like `AbC123`, it will return as a match. However, if we apply that same expression to something like  `AbC_123`, it will not return as a match, as the `alnum` character class does not include any symbols.
 
-If you need even more specific criteria, you can choose to include only specific characters within a set, instead of an entire class or range.
-
-If we apply something like `/[asdfghjkl]/` to a string like `abc`, it will not return a match, as it only allows the characters within the brackets. We're not talking about a range between those letters, we're talking about each individual letter. Any letters within a given string that were not not mentioned in that list will not return a match. 
-If we apply that example to a string such as `agk`, it will return a match, as all those characters are present in the expression.
+If we apply an expression like `/[asdfghjkl]/` to a string such as `poppy`, it will not return a match, since none of the letters in the given character class are present in the string. This expression would be looking for at least one of those lettesr to be present in the string, and since there is no quantifier next to it, the length of the string is not fixed to any number of characters, nor does it exclude other letters, numbers or special characters.
+A string like ``
 
 ### Grouping and Capturing
 
